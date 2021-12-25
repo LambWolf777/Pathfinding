@@ -25,7 +25,8 @@ Feedback I am looking for:
 
   -My GUI! I did not use tkinter except for filedialogs, since this project is a learning experience above all, it was alot of fun learning how to go about handling all the buttons triggers, althought my GUI.handle_buttons feels really heavy, readability wise. Any feedback or different approaches are more than welcome!
  
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  Thank you!
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Thank you!
   
 
   
