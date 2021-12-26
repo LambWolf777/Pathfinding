@@ -3,6 +3,8 @@ Pathfinding Algorithm visualizer and benchmarking
 
 Welcome to my first completed python project!
 
+![Showcase](https://user-images.githubusercontent.com/5695316/147415947-da66abe9-56cc-4229-8d68-e8ca9b16875c.gif)
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Things you should know when playing with my program:
 
