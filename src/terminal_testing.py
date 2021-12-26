@@ -608,7 +608,7 @@ if __name__ == "__main__":
                     diago = False
                     break
 
-            set_neighbors_time, grid = set_all_neighbors(all_nodes)
+            set_neighbors_time = set_all_neighbors(all_nodes)
 
             # inp = input("Do you wish to apply Rectangular Symetry Redction (RSR) to the grid? y/n\n")
             #
