@@ -1,0 +1,4 @@
+Python>=3.8
+
+future~=0.18.2      # added by my IDE, no idea why that's here
+pygame~=2.1.0
