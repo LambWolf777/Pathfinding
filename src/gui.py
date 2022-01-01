@@ -243,7 +243,7 @@ def init_gui(pathfinder_obj: Any, grid_obj: Grid) -> Gui:
         :param arg: display_moves_button.is_activated, For Checkboxes this parameter is always injected in is_clicked
         :return: None
         """
-        pathfinder_obj.display_steps = arg
+        pathfinder_obj.display = arg
 
         # if "wait_time_button" in gui.__dict__.keys() and "run_interval_button" in gui.__dict__.keys():
         try:
