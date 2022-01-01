@@ -71,10 +71,10 @@ class PathFinder:
 
         path.reverse()
 
-        if self.display:
-            for node in path:
-                node.is_path = True
-                cst.dirty_fills.append(node.get_fill())
+        
+        for node in path:
+            node.is_path = True
+            cst.dirty_fills.append(node.get_fill())
 
         return path
 
