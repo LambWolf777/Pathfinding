@@ -1,7 +1,10 @@
 # Pathfinding
 Pathfinding Algorithm visualizer and benchmarking
 
-Welcome to my first completed python project!
+Welcome to my first completed python/pygame project!
+
+Pretty much everything was made from scratch, I used Pygame to have access to graphics.
+I coded the Gui without any external librairies, which turned out to be the biggest part of the project!
 
 ![Showcase](https://user-images.githubusercontent.com/5695316/147415947-da66abe9-56cc-4229-8d68-e8ca9b16875c.gif)
 
