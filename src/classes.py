@@ -9,7 +9,7 @@ import config as cfg
 import constants as cst
 
 
-# TODO: Use a list of constants as flags instead
+# TODO: Use bitwise flags instead
 class Node:
     """Object for representing every tile (node on the grid)"""
 
