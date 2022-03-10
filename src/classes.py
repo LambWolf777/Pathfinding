@@ -26,23 +26,13 @@ class Node:
     END = 64
     ALL_FLAGS = 127
 
-    # is_path = False
-    # is_wall = False
-    # visited = False
     neighbors = None
     came_from = None
-    # came_from_diago = False  # useless now i think
+
     cost_so_far = 0
     heuristic = 0
     priority = 0
     color = cst.BLACK
-
-    # for RSR
-    # sym_rect = None
-    # is_sym_rect = False
-    # is_border = False
-    # is_start = False
-    # is_end = False
 
     def __init__(self, column: int, row: int, position: Tuple[int, int], node_width: int, node_height: int) -> None:
         """ Create a Node object

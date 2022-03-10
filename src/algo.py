@@ -24,6 +24,7 @@ def get_dt(func):
     return inner
 
 
+# TODO: Use bitmasks for flags
 class PathFinder:
     """Pathfinding tool to apply pathfinding algorithms and related methods to the grid specified in init"""
 
@@ -225,24 +226,16 @@ class PathFinder:
         if node is self.grid.end:
             self.shortest_path = self.build_path()
 
-        # I don't feel like it's worth wrapping this in another function, since no other algorithm uses it
         for neighbor, cost in node.get_available_neighbors(self.grid.all_nodes):
             neighbor.status |= Node.VISITED
             neighbor.came_from = node
             neighbor.cost_so_far = node.cost_so_far + cost
 
             if self.diago:
-                # Eucledian distance, was not proving to be efficient, also paths are weirder
-                # neighbor.heuristic = (((self.grid.end.row - neighbor.row)**2
-                #                        + (self.grid.end.column - neighbor.column)**2) ** .5)
-
-                # Thus we switch to diagonal (45 deg only) distance (octile, not chess)
+                # Octile distance (45 degrees diagonals only)
                 dx = abs(neighbor.column - self.grid.end.column)
                 dy = abs(neighbor.row - self.grid.end.row)
                 neighbor.heuristic = dx + dy + (1.41421 - 2) * min(dx, dy)
-                # neighbor.heuristic = (dx + dy) - 0.5857864376269049 * min(dx, dy)
-
-                # neighbor.heuristic = max(dx, dy) + 0.41421 * min(dx, dy)
 
             else:
                 neighbor.heuristic = abs(self.grid.end.row - neighbor.row) + \
