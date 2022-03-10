@@ -1,6 +1,6 @@
-WIN-10-Build
 .idea
 __pycache__
-Grids
+src/Grids
 Data
+venv
 
