@@ -409,9 +409,9 @@ class SimpleNode:
         """
         self.column = node.column
         self.row = node.row
-        self.is_wall = node.is_wall
-        self.is_start = node.is_start
-        self.is_end = node.is_end
+        self.is_wall = node.status & Node.WALL
+        self.is_start = node.status & Node.START
+        self.is_end = node.status & Node.END
 
     # TODO: Optimize this method
     def update_sym_rect_neighbors(self, grid: List[List['SimpleNode']]) -> None:

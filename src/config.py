@@ -6,7 +6,7 @@ import pygame as pg
 
 clock = pg.time.Clock()
 
-WINDOW_SIZE = (0, 0)
+WINDOW_SIZE = (1000, 800)
 
 if basename(modules["__main__"].__file__) == "terminal_testing.py":
     window = pg.display.set_mode(WINDOW_SIZE, flags=pg.HIDDEN)

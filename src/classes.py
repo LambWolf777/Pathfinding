@@ -16,23 +16,33 @@ class Node:
     # Those attributes will be used as instance attributes, but it was simpler to define them here since they
     # always start with the same values
 
-    is_path = False
-    is_wall = False
-    visited = False
+    # Node flags:
+    PATH = 1
+    WALL = 2
+    VISITED = 4
+    SYM_RECT = 8
+    BORDER = 16
+    START = 32
+    END = 64
+    ALL_FLAGS = 127
+
+    # is_path = False
+    # is_wall = False
+    # visited = False
     neighbors = None
     came_from = None
-    came_from_diago = False  # useless now i think
+    # came_from_diago = False  # useless now i think
     cost_so_far = 0
     heuristic = 0
     priority = 0
     color = cst.BLACK
 
     # for RSR
-    sym_rect = None
-    is_sym_rect = False
-    is_border = False
-    is_start = False
-    is_end = False
+    # sym_rect = None
+    # is_sym_rect = False
+    # is_border = False
+    # is_start = False
+    # is_end = False
 
     def __init__(self, column: int, row: int, position: Tuple[int, int], node_width: int, node_height: int) -> None:
         """ Create a Node object
@@ -48,6 +58,8 @@ class Node:
         self.column = column
         self.row = row
 
+        self.status = 0  # bitwise flags
+
         self.width = node_width
         self.height = node_height
         self.rect = pg.rect.Rect(self.position, (node_width, node_height))
@@ -56,19 +68,19 @@ class Node:
         """ Update the node's color according to its current status"""
 
         self.color = cst.BLACK
-        if self.is_start:
+        if self.status & Node.START:
             self.color = cst.BLUE
-        elif self.is_end:
+        elif self.status & Node.END:
             self.color = cst.GREEN
-        elif self.is_path:
+        elif self.status & Node.PATH:
             self.color = cst.PURPLE
-        elif self.is_wall:
+        elif self.status & Node.WALL:
             self.color = cst.WHITE
-        elif self.visited:
+        elif self.status & Node.VISITED:
             self.color = cst.YELLOW
-        elif self.is_border:
+        elif self.status & Node.BORDER:
             self.color = cst.RED
-        elif self.is_sym_rect:
+        elif self.status & Node.SYM_RECT:
             self.color = cst.ORANGE
 
     # TODO: Change to a display method
@@ -97,7 +109,7 @@ class Node:
 
             cost_multiplier = 1
 
-            while current.is_sym_rect:
+            while current.status & Node.SYM_RECT:
                 cost_multiplier += 1
                 new_col, new_row = cst.CYCLE_MOVES[direction](current.column, current.row)
                 current = grid[new_col][new_row]
@@ -105,7 +117,7 @@ class Node:
             return current, cost_multiplier
 
         for direction, (neighbor, cost) in self.neighbors.items():
-            if neighbor.is_sym_rect:
+            if neighbor.status & Node.SYM_RECT:
                 current, cost_mult = cycle_node(direction, neighbor)
                 self.neighbors[direction] = current, cost * cost_mult
 
@@ -119,7 +131,7 @@ class Node:
 
         for node, cost in self.neighbors.values():
 
-            if not (node.is_wall or node.visited):
+            if not node.status & (Node.WALL | Node.VISITED):
                 neighbors.append((node, cost))
 
         return neighbors
@@ -153,29 +165,33 @@ class Node:
         if diago_allowed:
 
             try:
-                if not neighbors["down"][0].is_wall and not neighbors["right"][0].is_wall:
+                if not neighbors["down"][0].status & Node.WALL\
+                        and not neighbors["right"][0].status & Node.WALL:
                     neighbors["downright"] = grid[self.column + 1][self.row + 1], 1.41421  # botright
             except KeyError:
                 pass
             try:
-                if not neighbors["up"][0].is_wall and not neighbors["right"][0].is_wall:
+                if not neighbors["up"][0].status & Node.WALL\
+                        and not neighbors["right"][0].status & Node.WALL:
                     neighbors["topright"] = grid[self.column + 1][self.row - 1], 1.41421  # topright
             except KeyError:
                 pass
 
             try:
-                if not neighbors["down"][0].is_wall and not neighbors["left"][0].is_wall:
+                if not neighbors["down"][0].status & Node.WALL\
+                        and not neighbors["left"][0].status & Node.WALL:
                     neighbors["downleft"] = grid[self.column - 1][self.row + 1], 1.41421  # botleft
             except KeyError:
                 pass
             try:
-                if not neighbors["up"][0].is_wall and not neighbors["left"][0].is_wall:
+                if not neighbors["up"][0].status & Node.WALL\
+                        and not neighbors["left"][0].status & Node.WALL:
                     neighbors["topleft"] = grid[self.column - 1][self.row - 1], 1.41421  # topleft
             except KeyError:
                 pass
 
         self.neighbors = neighbors
-        if self.is_border:  # if self is border...
+        if self.status & Node.BORDER:
             self.update_sym_rect_neighbors(grid)
 
 
@@ -954,32 +970,32 @@ class Grid:
                                 <= click.center[0] + brush_size + column[0].width:
                             for node in column:
                                 if pg.rect.Rect.colliderect(click, node):
-                                    if gui.start_node_button.is_activated and not node.is_wall:
+                                    if gui.start_node_button.is_activated and not node.status & Node.WALL:
                                         if self.start:
                                             temp = self.start
-                                            temp.is_start = False
+                                            temp.status &= ~Node.START
                                             self.start = None
                                             cst.dirty_fills.append(temp.get_fill())
                                         self.start = node
-                                        self.start.is_start = True
+                                        self.start.status |= Node.START
                                         cst.dirty_fills.append(node.get_fill())
 
-                                    elif gui.end_node_button.is_activated and not node.is_wall:
+                                    elif gui.end_node_button.is_activated and not node.status & Node.WALL:
                                         if self.end:
                                             temp = self.end
-                                            temp.is_end = False
+                                            temp.status &= ~Node.END
                                             self.end = None
                                             cst.dirty_fills.append(temp.get_fill())
                                         self.end = node
-                                        self.end.is_end = True
+                                        self.end.status |= Node.END
                                         cst.dirty_fills.append(node.get_fill())
 
                                     elif gui.draw_walls_button.is_activated \
                                             and node is not self.start and node is not self.end:
-                                        node.is_wall = True
+                                        node.status |= Node.WALL
                                         cst.dirty_fills.append(node.get_fill())
 
                                     elif gui.erase_walls_button.is_activated \
                                             and node is not self.start and node is not self.end:
-                                        node.is_wall = False
+                                        node.status &= ~Node.WALL
                                         cst.dirty_fills.append(node.get_fill())

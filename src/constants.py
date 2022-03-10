@@ -2,6 +2,7 @@
 
 import pygame as pg
 
+# events
 NO_PATH = pg.USEREVENT + 1
 NO_START = pg.USEREVENT + 2
 NO_END = pg.USEREVENT + 3

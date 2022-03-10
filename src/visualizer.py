@@ -53,7 +53,8 @@ def main():
         grid.handle_grid(main_gui)
 
         if pathfinder.running:
-            pathfinder.run(main_gui.run_interval_button.dict["value"], main_gui.wait_time_button.dict["value"])
+            pathfinder.run(main_gui.run_interval_button.dict["value"],
+                           main_gui.wait_time_button.dict["value"])
 
         stat_handler.main()
 

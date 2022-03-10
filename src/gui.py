@@ -16,8 +16,7 @@ import pygame as pg
 
 import config as cfg
 import constants as cst
-from classes import Button, DropDownButton, TextInputButton, Background, Checkbox, GridButton, StateButton, \
-    AlgoButton, SystemButton, Stat, OkButton, Grid
+from classes import *
 
 folder_path = getcwd()
 
@@ -232,7 +231,7 @@ def init_gui(pathfinder_obj: Any, grid_obj: Grid) -> Gui:
             for node in column:
                 if randrange(11) == 0:
                     if node is not grid_obj.start and node is not grid_obj.end:
-                        node.is_wall = True
+                        node.status |= Node.WALL
                         cst.dirty_fills.append(node.get_fill())
 
     def disp_moves_func(arg: bool) -> None:
@@ -387,14 +386,10 @@ def init_gui(pathfinder_obj: Any, grid_obj: Grid) -> Gui:
                 if node.update_color() is not cst.BLACK:
 
                     if not partial:
-                        node.is_wall = False
-                        node.is_end = False
-                        node.is_start = False
+                        node.status &= ~(Node.WALL | Node.END | Node.START)
 
-                    node.is_sym_rect = False
-                    node.is_border = False
-                    node.visited = False
-                    node.is_path = False
+                    node.status &= ~(Node.SYM_RECT | Node.BORDER |
+                                     Node.VISITED | Node.PATH)
 
                     cst.dirty_fills.append(node.get_fill())
 

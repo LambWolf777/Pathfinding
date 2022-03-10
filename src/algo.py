@@ -11,6 +11,7 @@ import pygame as pg
 
 import constants as cst
 import classes
+from classes import Node
 
 
 def get_dt(func):
@@ -71,9 +72,8 @@ class PathFinder:
 
         path.reverse()
 
-        
         for node in path:
-            node.is_path = True
+            node.status |= Node.PATH
             cst.dirty_fills.append(node.get_fill())
 
         return path
@@ -82,7 +82,7 @@ class PathFinder:
     def set_neighbors(self):
         for column in self.grid.all_nodes:
             for node in column:
-                if not node.is_sym_rect and not node.is_wall:
+                if not node.status & (Node.SYM_RECT | Node.WALL):
                     node.get_neighbors(self.grid.all_nodes, self.diago)
 
     def init_search(self) -> None:
@@ -106,7 +106,7 @@ class PathFinder:
         self.neighbors_prep_dt = self.set_neighbors()
 
         # Init all algorithms
-        self.grid.start.visited = True
+        self.grid.start.status |= Node.VISITED
         self.frontier.append(self.grid.start)
         self.queue.append((self.grid.start, self.grid.start.priority))
 
@@ -143,7 +143,7 @@ class PathFinder:
         for neighbor, cost in node.get_available_neighbors(self.grid.all_nodes):
             if costs:
                 neighbor.cost_so_far = node.cost_so_far + cost
-            neighbor.visited = True
+            neighbor.status |= Node.VISITED
             self.frontier.append(neighbor)
             neighbor.came_from = node
 
@@ -162,7 +162,7 @@ class PathFinder:
 
         for node_no in range(len(self.frontier)):
             node = self.frontier[node_no]
-            if node is self.grid.end:
+            if node is self.grid.end:   # Could change this to use node.status
                 self.shortest_path = self.build_path()
 
             self.to_be_removed.append(node)
@@ -227,7 +227,7 @@ class PathFinder:
 
         # I don't feel like it's worth wrapping this in another function, since no other algorithm uses it
         for neighbor, cost in node.get_available_neighbors(self.grid.all_nodes):
-            neighbor.visited = True
+            neighbor.status |= Node.VISITED
             neighbor.came_from = node
             neighbor.cost_so_far = node.cost_so_far + cost
 
@@ -245,7 +245,8 @@ class PathFinder:
                 # neighbor.heuristic = max(dx, dy) + 0.41421 * min(dx, dy)
 
             else:
-                neighbor.heuristic = abs(self.grid.end.row - neighbor.row) + abs(self.grid.end.column - neighbor.column)
+                neighbor.heuristic = abs(self.grid.end.row - neighbor.row) + \
+                                     abs(self.grid.end.column - neighbor.column)
 
             # This is to reduce comparison between ints and floats while keeping some precision
             neighbor.priority = neighbor.cost_so_far + neighbor.heuristic
@@ -267,9 +268,9 @@ class PathFinder:
                 node = self.grid.all_nodes[start.column + column][start.row + row]
 
                 if row == 0 or row == size - 1 or column == 0 or column == size - 1:
-                    node.is_border = True
+                    node.status |= Node.BORDER
                 else:
-                    node.is_sym_rect = True
+                    node.status |= Node.SYM_RECT
 
                 if self.display:
                     cst.dirty_fills.append(node.get_fill())
@@ -284,9 +285,12 @@ class PathFinder:
         # But using a flat copy of cst.all_nodes takes too much time to process.
         # Also, it is slow even while the algorithms are running...
 
+        check_free = lambda x: x.status & (Node.WALL | Node.BORDER |
+                                       Node.SYM_RECT | Node.START | Node.END)
+
         for column in self.grid.all_nodes:
             for start in column:
-                if not (start.is_wall or start.is_border or start.is_sym_rect or start.is_start or start.is_end):
+                if not check_free(start):
                     start_col, start_row = start.column, start.row
                     size = 1
                     hit_wall = False
@@ -298,12 +302,12 @@ class PathFinder:
                         try:
                             for add in range(size):
                                 node = self.grid.all_nodes[start_col + size - 1][start_row + add]
-                                if node.is_wall or node.is_border or node.is_sym_rect or node.is_start or node.is_end:
+                                if check_free(node):
                                     hit_wall = True
                                     break
 
                                 node = self.grid.all_nodes[start_col + add][start_row + size - 1]
-                                if node.is_wall or node.is_border or node.is_sym_rect or node.is_start or node.is_end:
+                                if check_free(node):
                                     hit_wall = True
                                     break
                         except IndexError:
